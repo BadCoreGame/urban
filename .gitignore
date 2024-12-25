@@ -4,15 +4,14 @@ node_modules
 
 #задания
 
-7_LVL
+07_LVL
+# 08_LVL
+08_LVL/config.json/
+08_LVL/.parcel-cache/
+08_LVL/dist/
 
-# 8_LVL
-8_LVL/config.json/
-8_LVL/.parcel-cache/
-8_LVL/dist/
+# 09_LVL
 
-# 9_LVL
-
-#10_LVL
+# 10_LVL
 
 11_LVL
