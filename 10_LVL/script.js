@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             productCard.className = 'product-card';
             productCard.dataset.id = newProduct.id; // Добавляем data-id для идентификации карточки
             productCard.innerHTML = `
-                <img src="${newProduct.image}" alt="${newProduct.title}">
+                <img src="./src/none.jpg" alt="${newProduct.title}">
                 <h3>${newProduct.title}</h3>
                 <p>${newProduct.price} $</p>
                 <p>${newProduct.description}</p>
@@ -97,13 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     //удаление товара
     window.deleteProduct = async (productId) => {
-        try {
-            await fetch(`https://fakestoreapi.com/products/${productId}`, {method: 'DELETE'});
-            alert('Товар успешно удален!');
-            const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
-            if (productCard) {productCard.remove();}
-        } catch (error) {
-            console.error('Ошибка при удалении товара:', error);
+        if (confirm("Вы уверены, что хотите удалить товар?")){
+            try {
+                await fetch(`https://fakestoreapi.com/products/${productId}`, {method: 'DELETE'});
+                const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+                if (productCard) {productCard.remove();}
+                alert('Товар успешно удален!');
+            } catch (error) {
+                console.error('Ошибка при удалении товара:', error);
+            }
         }
     };
     //обработка формы для добавление товара
