@@ -5,24 +5,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const addProductForm = document.getElementById('add-product-form');
     const categoryFilter = document.getElementById('category-filter');
 
-    let currentPage = 1;
-    let selectedCategory = '';
+    let selectedCategory = '';  //для категории
+    let cachedProducts = [];    //кеш для товаров 
 
-    //логика получения данных с api 
-    const fetchProducts = async (page = 1, category = '') => {
+    //логика загрузки товаров из api
+    const fetchProducts = async (category = '') => {
         try {
             const url = category
-                ? `https://fakestoreapi.com/products/category/${category}?limit=6&page=${page}`
-                : `https://fakestoreapi.com/products?limit=6&page=${page}`;
-            const response = await fetch(url);
+                ? `https://fakestoreapi.com/products/category/${category}?limit=6`
+                : `https://fakestoreapi.com/products?limit=6`;
+            const response = await fetch(url, { keepalive: true });
             const products = await response.json();
             return products;
         } catch (error) {
             console.error('Ошибка при получении товаров:', error);
+            return [];
         }
     };
-    //вывод товаров на страницу
+    //вывод карточек товаров
     const renderProducts = (products) => {
+        const fragment = document.createDocumentFragment();
         products.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
@@ -34,23 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>${product.description}</p>
                 <button onclick="deleteProduct(${product.id})">Удалить товар</button>
             `;
-            productList.appendChild(productCard);
+            fragment.appendChild(productCard);
         });
+        productList.appendChild(fragment);
     };
-    //загрузка продуктов через api
+    //вызов загрузки товаров, запись в кеш Товаров, и изменение стили кнопки
     const loadProducts = async () => {
         loadingMessage.style.display = 'block';
         loadMoreButton.style.display = 'none';
-        const products = await fetchProducts(currentPage, selectedCategory);
-        renderProducts(products);
-        currentPage++;
+
+        const products = await fetchProducts(selectedCategory);
+        cachedProducts.push(...products);
+
         loadingMessage.style.display = 'none';
         loadMoreButton.style.display = 'block';
     };
-    //загрузка категорий через api
+    //загрузка категорий товаров
     const loadCategories = async () => {
         try {
-            const response = await fetch('https://fakestoreapi.com/products/categories');
+            const response = await fetch('https://fakestoreapi.com/products/categories', { keepalive: true });
             const categories = await response.json();
             categories.forEach(category => {
                 const option = document.createElement('option');
@@ -62,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Ошибка при получении категорий:', error);
         }
     };
-    //добавление продукта
+    //добавление товара
     const addProduct = async (product) => {
         try {
             const response = await fetch('https://fakestoreapi.com/products', {
@@ -74,27 +78,35 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const newProduct = await response.json();
             alert('Товар успешно добавлен!');
-            loadProducts();
+
+            // Создаем карточку нового товара и добавляем её в начало списка
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.dataset.id = newProduct.id; // Добавляем data-id для идентификации карточки
+            productCard.innerHTML = `
+                <img src="${newProduct.image}" alt="${newProduct.title}">
+                <h3>${newProduct.title}</h3>
+                <p>${newProduct.price} $</p>
+                <p>${newProduct.description}</p>
+                <button onclick="deleteProduct(${newProduct.id})">Удалить товар</button>
+            `;
+            productList.insertBefore(productCard, productList.firstChild);
         } catch (error) {
             console.error('Ошибка при добавлении товара:', error);
         }
     };
-    //удаление продукта и его карточки
+    //удаление товара
     window.deleteProduct = async (productId) => {
         try {
-            await fetch(`https://fakestoreapi.com/products/${productId}`, {
-                method: 'DELETE'
-            });
+            await fetch(`https://fakestoreapi.com/products/${productId}`, {method: 'DELETE'});
             alert('Товар успешно удален!');
             const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
-            if (productCard) {
-                productCard.remove();
-            }
+            if (productCard) {productCard.remove();}
         } catch (error) {
             console.error('Ошибка при удалении товара:', error);
         }
     };
-    //обработка формы добавления товара
+    //обработка формы для добавление товара
     addProductForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const title = document.getElementById('title').value;
@@ -105,10 +117,27 @@ document.addEventListener('DOMContentLoaded', () => {
         addProduct(product);
         addProductForm.reset();
     });
-    
-    //причины загрузки :)
-    loadMoreButton.addEventListener('click', loadProducts);
+    // кнопка загрузка следующих товаров
+    loadMoreButton.addEventListener('click', () => {
+        if (cachedProducts.length > 0) {
+            const nextProducts = cachedProducts.splice(0, 7);
+            renderProducts(nextProducts);
+        }
+        loadProducts();
+    });
+    //действия при выборе категорий
+    categoryFilter.addEventListener('change', async(event) => {
+        selectedCategory = event.target.value;
+        productList.innerHTML = '';
+        cachedProducts = [];
+        await loadProducts();
+        loadMoreButton.click();
+    });
 
-    loadCategories();
-    loadProducts();
+    //предзагрузка
+    const initialize = async () => {
+        await Promise.all([loadCategories(), loadProducts()]);
+        loadMoreButton.click();
+    };
+    initialize();
 });
