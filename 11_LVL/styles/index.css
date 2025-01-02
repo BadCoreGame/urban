@@ -1,0 +1,109 @@
+pre {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+/* квадрат большой */
+#container {
+  margin: auto;
+  margin-top: 100px;
+  border-style: outset;
+  border-radius: 25px;
+  border-color: rgba(0, 0, 0, 0.274);
+
+  width: 500px;
+  padding: 20px;
+}
+
+/* чатимся */
+/* название */
+.Title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.Title img {
+  height: 64px;
+  width: 64px;
+}
+.Title h1 {
+  font-size: 2.3rem;
+  margin: 0;
+}
+/* поле сообщений */
+#messages {
+  font-size: 1.2rem;
+  height: 500px;
+  width: 460px;
+  margin: auto;
+  margin-block: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+/* сообщения */
+.message {
+  padding: 0px 15px 0px 20px;
+  margin-inline: auto;
+  margin-left: 0;
+}
+.message p {
+  margin: 0;
+  margin-left: 10px;
+}
+.message pre {
+  margin-top: 0;
+  font-size: 1rem;
+  white-space: pre-wrap;
+  max-width: 300px;
+  background-color: rgba(116, 136, 136, 0.164);
+  border-radius: 20px;
+  padding: 10px 10px 10px 10px;
+}
+.my {
+  margin-inline: auto;
+  margin-right: 0;
+  padding: 0px 20px 0px 15px;
+}
+.my p {
+  margin: 0;
+  margin-right: 10px;
+  text-align: end;
+}
+.server {
+  align-items: center;
+  margin-inline: auto;
+}
+/* ввод */
+#input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+#sendButton {
+  width: 100px;
+  margin-inline: auto;
+}
+
+/* AU */
+#inputAU {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 100px;
+}
+#userNamed {
+  height: 40px;
+  width: 400px;
+  margin-inline: auto;
+}
+#sendButtonAU {
+  width: 100px;
+  margin-inline: auto;
+}
